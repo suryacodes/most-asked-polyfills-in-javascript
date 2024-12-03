@@ -27,3 +27,12 @@ Function.prototype.myApply = function (context, args) {
     delete context[fnSymbol];
     return result;
 };
+
+//map
+Array.prototype.myMap = function (callback, thisArg) {
+    let newArr = [];
+    for (let i = 0; i < this.length; i++) {
+        newArr.push(callback.call(thisArg, this[i], i, this));
+    }
+    return newArr;
+};
