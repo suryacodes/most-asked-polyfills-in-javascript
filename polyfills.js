@@ -61,11 +61,65 @@ Array.prototype.myReduce = function (callback, initialVal) {
     return result;
 };
 
+
 //forEach
 Array.prototype.myForEach = function(callback) {
   for (let i = 0; i < this.length; i++) {
     callback(this[i], i, this);
   }
 };
+
+
+
+// Debounce function
+function debounce(fn, delay) {
+  let timeoutId;
+
+  return (...args) => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+    timeoutId = setTimeout(() => {
+      fn(...args);
+    }, delay);
+  };
+}
+
+const debouncedFunction = debounce(function (num) {
+  console.log("Debounced function called", num);
+}, 2000);
+
+debouncedFunction(1);
+debouncedFunction(2);
+debouncedFunction(3);
+
+
+
+// Throttle function
+function throttle(fn, delay) {
+  let timeoutId;
+
+  return (...args) => {
+    if (timeoutId) {
+      return;
+    }
+    timeoutId = setTimeout(() => {
+      fn(...args);
+      clearTimeout(timeoutId); 
+      timeoutId = null; 
+    }, delay);
+  };
+}
+
+const throttleFunction = throttle(function (num) {
+  console.log("Throttle function called", num);
+}, 2000);
+
+throttleFunction(1); // This will execute immediately
+throttleFunction(2); // Ignored
+throttleFunction(3); // Ignored
+
+setTimeout(() => throttleFunction(4), 1900); // Ignored 
+setTimeout(() => throttleFunction(5), 5000); // Executed 
 
 
