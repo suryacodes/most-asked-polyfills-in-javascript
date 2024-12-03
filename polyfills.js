@@ -123,3 +123,38 @@ setTimeout(() => throttleFunction(4), 1900); // Ignored
 setTimeout(() => throttleFunction(5), 5000); // Executed 
 
 
+//Memoize
+function myMemoize(callback) {
+  const cache = {};
+
+  return (...args) => {
+    const key = JSON.stringify(args); 
+
+    if (cache[key] !== undefined) {
+      return cache[key];
+    }
+
+    cache[key] = callback(...args); 
+    return cache[key];
+  };
+}
+
+const expensiveFunc = (num1, num2) => {
+  let output = 1;
+  for (let i = 0; i <= 10000000; i++) {
+    output += i;
+  }
+  return num1 + num2 + output;
+};
+
+const memoizeFunc = myMemoize(expensiveFunc);
+
+console.time("First call");
+console.log(memoizeFunc(1, 2));
+console.timeEnd("First call");
+
+console.time("Second call");
+console.log(memoizeFunc(1, 2));
+console.timeEnd("Second call");
+
+
