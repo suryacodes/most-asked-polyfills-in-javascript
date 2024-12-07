@@ -158,3 +158,31 @@ console.log(memoizeFunc(1, 2));
 console.timeEnd("Second call");
 
 
+//LRUCache 
+class LRUCache {
+  constructor(limit) {
+    this.limit = limit;
+    this.cache = new Map();
+  }
+
+  set(key, value) {
+    if (this.cache.has(key)) this.cache.delete(key);
+    if (this.cache.size === this.limit) {
+      const oldestKey = this.cache.keys().next().value;
+      this.cache.delete(oldestKey);
+    }
+    this.cache.set(key, value);
+  }
+
+  get(key) {
+    if (!this.cache.has(key)) return -1;
+    const value = this.cache.get(key);
+    this.cache.delete(key);
+    this.cache.set(key, value);
+    return value;
+  }
+}
+
+
+
+
