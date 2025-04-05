@@ -96,20 +96,19 @@ debouncedFunction(3);
 
 
 // Throttle function
-function throttle(fn, delay) {
-  let timeoutId;
-
-  return (...args) => {
-    if (timeoutId) {
-      return;
+const throttle = (func, delay) => {
+  let isCalled = false;
+  return function (...args) {
+    if (!isCalled) {
+      func(...args);
+      isCalled = true;
+      setTimeout(() => {
+        isCalled = false;
+      }, delay);
     }
-    timeoutId = setTimeout(() => {
-      fn(...args);
-      clearTimeout(timeoutId); 
-      timeoutId = null; 
-    }, delay);
   };
-}
+};
+
 
 const throttleFunction = throttle(function (num) {
   console.log("Throttle function called", num);
