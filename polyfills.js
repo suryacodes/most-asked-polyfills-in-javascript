@@ -183,5 +183,40 @@ class LRUCache {
 }
 
 
+function createSetTimout() {
+  let timerId = 0;
+  let timerMap = {};
+
+  const setTimeoutPoly = (callback, delay) => {
+    timerId += 1;
+    const currentId = timerId;
+    timerMap[currentId] = true;
+    const startTime = Date.now();
+
+    function triggerCallBack() {
+      if (!timerMap[currentId]) return;
+
+      const now = Date.now();
+      if (now - startTime >= delay) {
+        callback();
+        delete timerMap[currentId];
+      } else {
+        setImmediate(triggerCallBack);
+      }
+    }
+
+    setImmediate(triggerCallBack);
+    return currentId;
+  };
+
+  const clearTimeOut = (id) => {
+    delete timerMap[id];
+  };
+
+  return { setTimeoutPoly, clearTimeOut };
+}
+
+const { setTimeoutPoly, clearTimeOut } = createSetTimout();
+
 
 
