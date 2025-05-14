@@ -183,6 +183,7 @@ class LRUCache {
 }
 
 
+// setTimeout
 function createSetTimout() {
   let timerId = 0;
   let timerMap = {};
@@ -216,7 +217,38 @@ function createSetTimout() {
   return { setTimeoutPoly, clearTimeOut };
 }
 
-const { setTimeoutPoly, clearTimeOut } = createSetTimout();
 
+//setInterval
+function createSetInterval() {
+  let timerId = 0;
+  let timerMap = {};
 
+  const setIntervalPoly = (callback, delay) => {
+    timerId += 1;
+    const currentId = timerId;
+    timerMap[currentId] = true;
+
+    let nextTime = Date.now() + delay;
+
+    function triggerCallBack() {
+      if (!timerMap[currentId]) return;
+
+      const now = Date.now();
+      if (now >= nextTime) {
+        callback();
+        nextTime += delay;
+      }
+      setImmediate(triggerCallBack);
+    }
+
+    setImmediate(triggerCallBack);
+    return currentId;
+  };
+
+  const clearInterval = (id) => {
+    delete timerMap[id];
+  };
+
+  return { setIntervalPoly, clearInterval };
+}
 
