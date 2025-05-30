@@ -252,3 +252,91 @@ function createSetInterval() {
   return { setIntervalPoly, clearInterval };
 }
 
+
+//Promise
+function CustomPromise(executor) {
+  let fulfilled = false;
+  let rejected = false;
+  let resolvedData = null;
+  let rejectedErr = null;
+  let thenHandlers = [];
+  let catchHandler = null;
+
+  const resolve = (data) => {
+    if (fulfilled || rejected) return; 
+    fulfilled = true;
+    resolvedData = data;
+
+    queueMicrotask(() => {
+      let result = resolvedData;
+      try {
+        for (const handler of thenHandlers) {
+          result = handler(result);
+        }
+      } catch (err) {
+        reject(err);
+      }
+    });
+  };
+
+  const reject = (err) => {
+    if (fulfilled || rejected) return; 
+    rejected = true;
+    rejectedErr = err;
+
+    queueMicrotask(() => {
+      if (catchHandler) {
+        catchHandler(rejectedErr);
+      }
+    });
+  };
+
+  this.then = (callbackFn) => {
+    return new CustomPromise((resolveNext, rejectNext) => {
+      const handler = (data) => {
+        try {
+          const result = callbackFn(data);
+          if (result instanceof CustomPromise) {
+            result.then(resolveNext).catch(rejectNext);
+          } else {
+            resolveNext(result);
+          }
+        } catch (err) {
+          rejectNext(err);
+        }
+      };
+
+      if (fulfilled) {
+        queueMicrotask(() => handler(resolvedData));
+      } else if (!rejected) {
+        thenHandlers.push(handler);
+      }
+    });
+  };
+
+  this.catch = (callbackFn) => {
+    return new CustomPromise((resolveNext, rejectNext) => {
+      const handler = (err) => {
+        try {
+          const result = callbackFn(err);
+          resolveNext(result);
+        } catch (e) {
+          rejectNext(e);
+        }
+      };
+
+      if (rejected) {
+        queueMicrotask(() => handler(rejectedErr));
+      } else {
+        catchHandler = handler;
+      }
+    });
+  };
+
+  try {
+    executor(resolve, reject);
+  } catch (err) {
+    reject(err);
+  }
+}
+
