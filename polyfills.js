@@ -252,6 +252,29 @@ function createSetInterval() {
   return { setIntervalPoly, clearInterval };
 }
 
+//deep clone
+function deepClone(obj, hash = new WeakMap()) {
+    if (obj === null || typeof obj !== "object") {
+      return obj;
+    }
+    
+    if (obj instanceof Date) {
+      return new Date(obj);
+    }
+    
+    if (hash.has(obj)) {
+      return hash.get(obj);
+    }
+    
+    const result = Array.isArray(obj) ? [] : {};
+    hash.set(obj, result);
+    
+    Object.entries(obj).forEach(([key, value]) => {
+      result[key] = deepClone(value, hash);
+    });
+    
+    return result;
+}
 
 //Promise
 function CustomPromise(executor) {
